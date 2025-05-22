@@ -1,0 +1,24 @@
+{% extends 'ads/base.html' %}
+{% block title %}Все объявления{% endblock %}
+{% block content %}
+  <h2>Все объявления</h2>
+
+  {% if ads %}
+    <div class="row">
+      {% for ad in ads %}
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ ad.title }}</h5>
+              <p class="card-text">{{ ad.description|truncatewords:25 }}</p>
+              <p class="text-muted small">{{ ad.get_category_display }} | {{ ad.get_condition_display }}</p>
+              <a href="{% url 'ads:ad_detail' ad.id %}" class="btn btn-sm btn-primary">Подробнее</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Объявлений пока нет</p>
+  {% endif %}
+{% endblock %}
