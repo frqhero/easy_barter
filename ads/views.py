@@ -46,3 +46,23 @@ def delete_ad(request, pk):
         return redirect('ads:list_ads')
 
     return render(request, 'ads/ad_confirm_delete.html', {'ad': ad})
+
+
+@login_required
+def update_ad(request, pk):
+    ad = get_object_or_404(Ad, pk=pk)
+
+    if ad.user != request.user:
+        messages.error(request, "Вы не можете редактировать чужое объявление.")
+        return redirect('ads:ad_detail', pk=ad.pk)
+
+    if request.method == 'POST':
+        form = AdForm(request.POST, instance=ad)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Объявление обновлено.")
+            return redirect('ads:ad_detail', pk=ad.pk)
+    else:
+        form = AdForm(instance=ad)
+
+    return render(request, 'ads/ad_form.html', {'form': form, 'ad': ad})
