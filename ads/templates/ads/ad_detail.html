@@ -18,7 +18,7 @@
         {% if user.is_authenticated %}
           {% if ad.user == user %}
             <a href="" class="btn btn-warning btn-sm">Редактировать</a>
-            <a href="" class="btn btn-danger btn-sm">Удалить</a>
+            <a href="{% url 'ads:delete_ad' ad.id %}" class="btn btn-danger btn-sm">Удалить</a>
           {% else %}
             <a href="" class="btn btn-success btn-sm">Предложить обмен</a>
           {% endif %}

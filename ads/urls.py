@@ -7,5 +7,6 @@ app_name = 'ads'
 urlpatterns = [
     path('', views.list_ads, name='list_ads'),
     path('ads/<int:pk>/', views.ad_detail, name='ad_detail'),
+    path('ads/<int:pk>/delete/', views.delete_ad, name='delete_ad'),
     path('ads/create/', views.create_ad, name='create_ad'),
 ]

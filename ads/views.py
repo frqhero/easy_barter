@@ -30,3 +30,19 @@ def create_ad(request):
 def ad_detail(request, pk):
     ad = get_object_or_404(Ad, pk=pk)
     return render(request, 'ads/ad_detail.html', {'ad': ad})
+
+
+@login_required
+def delete_ad(request, pk):
+    ad = get_object_or_404(Ad, pk=pk)
+
+    if ad.user != request.user:
+        messages.error(request, "Вы не можете удалить чужое объявление.")
+        return redirect('ads:ad_detail', pk=ad.pk)
+
+    if request.method == "POST":
+        ad.delete()
+        messages.success(request, "Объявление удалено.")
+        return redirect('ads:list_ads')
+
+    return render(request, 'ads/ad_confirm_delete.html', {'ad': ad})
