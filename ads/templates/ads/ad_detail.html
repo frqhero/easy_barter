@@ -20,7 +20,7 @@
             <a href="{% url 'ads:update_ad' ad.id %}" class="btn btn-warning btn-sm">Редактировать</a>
             <a href="{% url 'ads:delete_ad' ad.id %}" class="btn btn-danger btn-sm">Удалить</a>
           {% else %}
-            <a href="" class="btn btn-success btn-sm">Предложить обмен</a>
+            <a href="{% url 'ads:create_proposal' ad.id %}" class="btn btn-success btn-sm">Предложить обмен</a>
           {% endif %}
         {% endif %}
       </div>

@@ -24,6 +24,9 @@ class Ad(models.Model):
     def __str__(self):
         return f'{self.title} ({self.user.username})'
 
+    class Meta:
+        ordering = ['-created_at']
+
 
 class ExchangeProposal(models.Model):
     class Status(models.TextChoices):
