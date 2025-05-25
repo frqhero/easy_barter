@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
 from ads.forms import AdForm, ExchangeProposalForm
 
-from ads.models import Ad
+from ads.models import Ad, ExchangeProposal
 
 
 def list_ads(request):
@@ -118,3 +119,33 @@ def create_proposal(request, ad_id):
 
     return render(request, 'ads/proposal_form.html', {'form': form, 'target_ad': target_ad})
 
+
+@login_required
+def list_proposals(request):
+    received_proposals = ExchangeProposal.objects.filter(ad_receiver__user=request.user)
+    sent_proposals = ExchangeProposal.objects.filter(ad_sender__user=request.user)
+
+    context = {
+        'received_proposals': received_proposals,
+        'sent_proposals': sent_proposals,
+    }
+
+    return render(request, 'ads/list_proposals.html', context)
+
+
+@login_required
+def accept_proposal(request, proposal_id):
+    proposal = get_object_or_404(ExchangeProposal, pk=proposal_id)
+
+    if proposal.ad_receiver.user != request.user:
+        messages.error(request, "Вы не можете принять предолжение адресованое другому пользователю.")
+        return redirect('ads:list_proposals')
+
+    if request.method == 'POST':
+        proposal.status = 'accepted'
+        proposal.save()
+
+        messages.success(request, 'Предложение принято!')
+        return redirect('ads:list_proposals')
+
+    return render(request, 'ads/confirm_accept.html', {'proposal': proposal})

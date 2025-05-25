@@ -11,4 +11,7 @@ urlpatterns = [
     path('ads/create/', views.create_ad, name='create_ad'),
     path('ads/<int:pk>/edit/', views.update_ad, name='update_ad'),
     path('proposals/create/<int:ad_id>/', views.create_proposal, name='create_proposal'),
+    path('proposals/', views.list_proposals, name='list_proposals'),
+    path('proposals/<int:pk>/accept/', views.accept_proposal, name='accept_proposal'),
+
 ]
