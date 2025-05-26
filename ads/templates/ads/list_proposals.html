@@ -9,7 +9,7 @@
         <small>от {{ proposal.ad_sender.user.username }}</small><br>
         💬 {{ proposal.comment }}<br>
         <div class="mt-2">
-          <a href="" class="btn btn-sm btn-success">Принять</a>
+          <a href="{% url 'ads:accept_proposal' proposal.id %}" class="btn btn-sm btn-success">Принять</a>
           <a href="" class="btn btn-sm btn-danger">Отклонить</a>
         </div>
       </div>

@@ -122,7 +122,10 @@ def create_proposal(request, ad_id):
 
 @login_required
 def list_proposals(request):
-    received_proposals = ExchangeProposal.objects.filter(ad_receiver__user=request.user)
+    received_proposals = ExchangeProposal.objects.filter(
+        ad_receiver__user=request.user,
+        status=ExchangeProposal.Status.PENDING,
+    )
     sent_proposals = ExchangeProposal.objects.filter(ad_sender__user=request.user)
 
     context = {

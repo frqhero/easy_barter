@@ -15,7 +15,7 @@
     <form method="post">
       {% csrf_token %}
       <button type="submit" class="btn btn-success">Принять</button>
-      <a href="{% url 'list_proposals' %}" class="btn btn-secondary">Отмена</a>
+      <a href="{% url 'ads:list_proposals' %}" class="btn btn-secondary">Отмена</a>
     </form>
   </div>
 {% endblock %}

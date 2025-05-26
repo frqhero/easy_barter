@@ -29,14 +29,13 @@ class Ad(models.Model):
 
 
 class ExchangeProposal(models.Model):
+    ad_sender = models.ForeignKey('Ad', related_name='sent_proposals', on_delete=models.CASCADE)
+    ad_receiver = models.ForeignKey('Ad', related_name='received_proposals', on_delete=models.CASCADE)
+    comment = models.TextField(blank=True)
     class Status(models.TextChoices):
         PENDING = 'pending', 'Ожидает'
         ACCEPTED = 'accepted', 'Принята'
         REJECTED = 'rejected', 'Отклонена'
-    ad_sender = models.ForeignKey('Ad', related_name='sent_proposals', on_delete=models.CASCADE)
-
-    ad_receiver = models.ForeignKey('Ad', related_name='received_proposals', on_delete=models.CASCADE)
-    comment = models.TextField(blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
 
