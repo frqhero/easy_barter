@@ -1,9 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 from ads.forms import AdForm, ExchangeProposalForm
 
@@ -67,12 +67,12 @@ def delete_ad(request, pk):
     ad = get_object_or_404(Ad, pk=pk)
 
     if ad.user != request.user:
-        messages.error(request, "Вы не можете удалить чужое объявление.")
+        messages.error(request, 'Вы не можете удалить чужое объявление.')
         return redirect('ads:ad_detail', pk=ad.pk)
 
-    if request.method == "POST":
+    if request.method == 'POST':
         ad.delete()
-        messages.success(request, "Объявление удалено.")
+        messages.success(request, 'Объявление удалено.')
         return redirect('ads:list_ads')
 
     return render(request, 'ads/ad_confirm_delete.html', {'ad': ad})
@@ -83,14 +83,14 @@ def update_ad(request, pk):
     ad = get_object_or_404(Ad, pk=pk)
 
     if ad.user != request.user:
-        messages.error(request, "Вы не можете редактировать чужое объявление.")
+        messages.error(request, 'Вы не можете редактировать чужое объявление.')
         return redirect('ads:ad_detail', pk=ad.pk)
 
     if request.method == 'POST':
         form = AdForm(request.POST, instance=ad)
         if form.is_valid():
             form.save()
-            messages.success(request, "Объявление обновлено.")
+            messages.success(request, 'Объявление обновлено.')
             return redirect('ads:ad_detail', pk=ad.pk)
     else:
         form = AdForm(instance=ad)
@@ -103,7 +103,7 @@ def create_proposal(request, ad_id):
     target_ad = get_object_or_404(Ad, pk=ad_id)
 
     if target_ad.user == request.user:
-        messages.error(request, "Нельзя предлагать обмен самому себе.")
+        messages.error(request, 'Нельзя предлагать обмен самому себе.')
         return redirect('ads:ad_detail', ad_id)
 
     if request.method == 'POST':
@@ -112,7 +112,7 @@ def create_proposal(request, ad_id):
             proposal = form.save(commit=False)
             proposal.ad_receiver = target_ad
             proposal.save()
-            messages.success(request, "Предложение отправлено.")
+            messages.success(request, 'Предложение отправлено.')
             return redirect('ads:ad_detail', ad_id)
     else:
         form = ExchangeProposalForm(user=request.user)
@@ -141,7 +141,7 @@ def accept_proposal(request, proposal_id):
     proposal = get_object_or_404(ExchangeProposal, pk=proposal_id)
 
     if proposal.ad_receiver.user != request.user:
-        messages.error(request, "Вы не можете принять предолжение адресованое другому пользователю.")
+        messages.error(request, 'Вы не можете принять предолжение адресованое другому пользователю.')
         return redirect('ads:list_proposals')
 
     if request.method == 'POST':
@@ -152,3 +152,23 @@ def accept_proposal(request, proposal_id):
         return redirect('ads:list_proposals')
 
     return render(request, 'ads/confirm_accept.html', {'proposal': proposal})
+
+
+@require_POST
+@login_required
+def reject_proposal(request, proposal_id):
+    proposal = get_object_or_404(ExchangeProposal, id=proposal_id)
+
+    if proposal.ad_receiver.user != request.user:
+        messages.error(request, 'Вы не можете отменить это предложение.')
+        return redirect('ads:list_proposals')
+
+    if proposal.status != ExchangeProposal.Status.PENDING:
+        messages.warning(request, 'Это предложение уже обработано и не может быть отменено.')
+        return redirect('ads:list_proposals')
+
+    proposal.status = 'canceled'
+    proposal.save()
+
+    messages.success(request, 'Предложение успешно отменено.')
+    return redirect('ads:list_proposals')
