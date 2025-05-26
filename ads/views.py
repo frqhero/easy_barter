@@ -122,18 +122,33 @@ def create_proposal(request, ad_id):
 
 @login_required
 def list_proposals(request):
-    received_proposals = ExchangeProposal.objects.filter(
-        ad_receiver__user=request.user,
-        status=ExchangeProposal.Status.PENDING,
+    view_mode = request.GET.get('view', 'received')
+    status_filter = request.GET.get('status')
+    user_filter = request.GET.get('user')
+
+    if view_mode == 'sent':
+        proposals = ExchangeProposal.objects.filter(ad_sender__user=request.user)
+        if status_filter:
+            proposals = proposals.filter(status=status_filter)
+        if user_filter:
+            proposals = proposals.filter(ad_receiver__user__username__icontains=user_filter)
+    else:
+        proposals = ExchangeProposal.objects.filter(ad_receiver__user=request.user)
+        if status_filter:
+            proposals = proposals.filter(status=status_filter)
+        if user_filter:
+            proposals = proposals.filter(ad_sender__user__username__icontains=user_filter)
+
+    return render(
+        request,
+        'ads/list_proposals.html',
+        {
+        'view_mode': view_mode,
+        'proposals': proposals,
+        'status_filter': status_filter or '',
+        'user_filter': user_filter or '',
+        }
     )
-    sent_proposals = ExchangeProposal.objects.filter(ad_sender__user=request.user)
-
-    context = {
-        'received_proposals': received_proposals,
-        'sent_proposals': sent_proposals,
-    }
-
-    return render(request, 'ads/list_proposals.html', context)
 
 
 @login_required
