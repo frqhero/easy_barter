@@ -160,7 +160,7 @@ def accept_proposal(request, proposal_id):
         return redirect('ads:list_proposals')
 
     if request.method == 'POST':
-        proposal.status = 'accepted'
+        proposal.status = ExchangeProposal.Status.ACCEPTED
         proposal.save()
 
         messages.success(request, 'Предложение принято!')
@@ -182,7 +182,7 @@ def reject_proposal(request, proposal_id):
         messages.warning(request, 'Это предложение уже обработано и не может быть отменено.')
         return redirect('ads:list_proposals')
 
-    proposal.status = 'canceled'
+    proposal.status = ExchangeProposal.Status.REJECTED
     proposal.save()
 
     messages.success(request, 'Предложение успешно отменено.')
